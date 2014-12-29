@@ -6,60 +6,20 @@ using System.Drawing.Imaging;
 
 namespace ImageProcessing
 {
-    class MainTread
+    class MainEntryPoint
     {
-        static void Main(string[] args)
+        [STAThread]
+        static void Main()
         {
-            List<ClusterPoint> points = new List<ClusterPoint>();
-            points.Add(new ClusterPoint(0, 4));
-            points.Add(new ClusterPoint(0, 2));
-            points.Add(new ClusterPoint(0, 0));
-            points.Add(new ClusterPoint(1, 3));
-            points.Add(new ClusterPoint(1, 2));
-            points.Add(new ClusterPoint(1, 1));
-            points.Add(new ClusterPoint(2, 2));
-            points.Add(new ClusterPoint(3, 2));
-            points.Add(new ClusterPoint(4, 2));
-            points.Add(new ClusterPoint(5, 3));
-            points.Add(new ClusterPoint(5, 2));
-            points.Add(new ClusterPoint(5, 1));
-            points.Add(new ClusterPoint(6, 4));
-            points.Add(new ClusterPoint(6, 2));
-            points.Add(new ClusterPoint(6, 0));
-
-            List<ClusterCentroid> centroids = new List<ClusterCentroid>();
-
-            centroids.Add(new ClusterCentroid(0, 0));
-            centroids.Add(new ClusterCentroid(0, 0));
-
-            CMeansAlgorithm alg = new CMeansAlgorithm(points, centroids, 2);
-            int iterations = alg.Run(Math.Pow(10, -5));
-
-            double[,] Matrix = alg.U;
-
-            for (int j = 0; j < points.Count; j++)
-            {
-                for (int i = 0; i < centroids.Count; i++)
-                {
-                    ClusterPoint p = points[j];
-                    Console.WriteLine("{0:00} Point: ({1};{2}) ClusterIndex: {3} Value: {4:0.000}", j + 1, p.X, p.Y, p.ClusterIndex, Matrix[j, i]);
-                }
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("Iteration count: {0}", iterations);
-            Console.WriteLine();
-            Console.WriteLine("Please press any key to exit...");
-            Console.WriteLine(string.Format("center x = {0},center y = {1}", centroids[0].X, centroids[0].Y));
-            Console.WriteLine(string.Format("center x = {0},center y = {1}", centroids[1].X, centroids[1].Y));
-            Console.ReadLine();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
         }
     }
+
     public class ClusterPoint
     {
         ///
-
-
         /// Gets or sets X-coord of the point
         ///
 
@@ -399,26 +359,5 @@ namespace ImageProcessing
             while (maxIterations > i);
             return i;
         }
-
-        GrayColorMix[] GetBitmapData(string path)
-        {
-            try
-            {
-                Bitmap bitmap = (Bitmap)Bitmap.FromFile(path);
-                GrayColorMix[] grayData = new GrayColorMix[bitmap.Width * bitmap.Height];
-                return grayData;
-            }
-            catch (System.Exception ex)
-            {
-                Console.WriteLine(ex);
-                return null;
-            }
-        }
-    }
-
-    class GrayColorMix
-    {
-        public Color color;
-        public byte gray;
     }
 }

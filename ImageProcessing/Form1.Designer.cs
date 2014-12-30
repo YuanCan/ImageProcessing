@@ -34,6 +34,7 @@
             this.OriginalImage = new System.Windows.Forms.Button();
             this.Category = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.ImplementFCM = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.ImageArea)).BeginInit();
             this.SuspendLayout();
             // 
@@ -94,12 +95,24 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 21);
             this.textBox1.TabIndex = 5;
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
+            // ImplementFCM
+            // 
+            this.ImplementFCM.Location = new System.Drawing.Point(273, 1);
+            this.ImplementFCM.Name = "ImplementFCM";
+            this.ImplementFCM.Size = new System.Drawing.Size(75, 23);
+            this.ImplementFCM.TabIndex = 6;
+            this.ImplementFCM.Text = "FCM";
+            this.ImplementFCM.UseVisualStyleBackColor = true;
+            this.ImplementFCM.Click += new System.EventHandler(this.ImplementFCM_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 511);
+            this.Controls.Add(this.ImplementFCM);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.Category);
             this.Controls.Add(this.OriginalImage);
@@ -122,6 +135,7 @@
         private System.Windows.Forms.Button OriginalImage;
         private System.Windows.Forms.Label Category;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button ImplementFCM;
     }
 }
 

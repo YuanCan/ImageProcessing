@@ -52,5 +52,19 @@ namespace ImageProcessing
             Image data = ViewController.GetInstance().OnClickOriginal();
             this.ImageArea.Image = data;
         }
+
+        private void ImplementFCM_Click(object sender, EventArgs e)
+        {
+            CMeansAlgorithm processing = new CMeansAlgorithm();
+            processing.PrepareForRun(ViewController.GetInstance().categoryNumber);
+            processing.Run(Math.Pow(10, -5));
+            ImageContainer.GetInstance().CreateBitmap(processing.Points);
+            this.ImageArea.Image = ImageContainer.GetInstance().processedBitmap;
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            int.TryParse(textBox1.Text, out ViewController.GetInstance().categoryNumber);
+        }
     }
 }

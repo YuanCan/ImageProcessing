@@ -10,9 +10,11 @@ namespace ImageProcessing
     public class ImageContainer
     {
         public GrayColorMix[] imageData;
+        public Bitmap processedBitmap;
 
         private Bitmap grayBitmap;
         private Bitmap originalBitmap;
+       
 
         private int width;
         private int height;
@@ -152,6 +154,47 @@ namespace ImageProcessing
                 setAlpha = (byte)gray;
             }
             return gray;
+        }
+
+        public void CreateBitmap(ClusterPoint[] points)
+        {
+            if (points.Length != width * height)
+            {
+                Console.WriteLine("Invalid length " + points.Length);
+                return;
+            }
+
+            if (processedBitmap == null)
+            {
+                processedBitmap = new Bitmap(width, height);
+            }
+            Rectangle rect = new Rectangle(0, 0, width, height);
+            BitmapData data = processedBitmap.LockBits(rect, ImageLockMode.ReadWrite, originalBitmap.PixelFormat);
+            int length = data.Stride * height;
+            byte[] bytesData = new byte[length];
+            // get the byte offset
+            int offset = originalBitmap.PixelFormat == PixelFormat.Format32bppArgb ? 4 : 3;
+            // copy the bitmap data
+            Marshal.Copy(data.Scan0, bytesData, 0, length);
+            for (int index = 0; index < length; index += offset)
+            {
+                int dataIndex = index / offset;
+                if (originalBitmap.PixelFormat == PixelFormat.Format32bppArgb)
+                {
+                    bytesData[index] = (byte)(points[dataIndex].ClusterIndex * 100);
+                    bytesData[index + 1] = (byte)(points[dataIndex].ClusterIndex * 100);
+                    bytesData[index + 2] = (byte)(points[dataIndex].ClusterIndex * 100);
+                    bytesData[index + 3] =0xff;
+                }
+                else
+                {
+                    bytesData[index] = (byte)(points[dataIndex].ClusterIndex * 100);
+                    bytesData[index + 1] = (byte)(points[dataIndex].ClusterIndex * 100);
+                    bytesData[index + 2] = (byte)(points[dataIndex].ClusterIndex * 100);
+                }
+            }
+            Marshal.Copy(bytesData, 0, data.Scan0, length);
+            processedBitmap.UnlockBits(data);
         }
     }
 

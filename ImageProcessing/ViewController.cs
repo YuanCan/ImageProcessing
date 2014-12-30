@@ -8,6 +8,8 @@ namespace ImageProcessing
 {
     public class ViewController
     {
+        public int categoryNumber;
+
         private static ViewController instance;
 
         static public ViewController GetInstance()

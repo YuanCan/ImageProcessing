@@ -116,7 +116,7 @@ namespace ImageProcessing
         /// Array containing all points used by the algorithm
         ///
 
-        private ClusterPoint[] Points;
+        public ClusterPoint[] Points;
 
         ///
 
@@ -170,8 +170,9 @@ namespace ImageProcessing
         /// Private constructor
         ///
 
-        private CMeansAlgorithm()
+        public CMeansAlgorithm()
         {
+
         }
 
         ///
@@ -362,7 +363,10 @@ namespace ImageProcessing
                 Points[index] = new ClusterPoint(data.x,data.y);
                 Points[index].GrayValue = (double)data.gray;
             }
-
+            for (int index = 0; index < categoryNumber;index++)
+            {
+                Clusters[index] = new ClusterCentroid(0,0);
+            }
             InitMembershipMatrix(U, categoryNumber, samplerNumber);
             CalculateClusterCenters();
         }

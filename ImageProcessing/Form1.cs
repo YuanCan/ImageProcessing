@@ -33,6 +33,7 @@ namespace ImageProcessing
 
             Image data = ViewController.GetInstance().OnClickOpenFile(myname);
             this.ImageArea.Image = data;
+            this.ClientSize = new System.Drawing.Size(data.Width + 20, data.Height + 50);
         }
 
         private void ImageArea_Click(object sender, EventArgs e)

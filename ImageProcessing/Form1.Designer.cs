@@ -32,6 +32,8 @@
             this.ImageArea = new System.Windows.Forms.PictureBox();
             this.GrayImage = new System.Windows.Forms.Button();
             this.OriginalImage = new System.Windows.Forms.Button();
+            this.Category = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.ImageArea)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,7 +53,7 @@
             this.ImageArea.Location = new System.Drawing.Point(12, 30);
             this.ImageArea.Name = "ImageArea";
             this.ImageArea.Size = new System.Drawing.Size(844, 461);
-            this.ImageArea.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.ImageArea.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageArea.TabIndex = 1;
             this.ImageArea.TabStop = false;
             this.ImageArea.Click += new System.EventHandler(this.ImageArea_Click);
@@ -76,11 +78,30 @@
             this.OriginalImage.UseVisualStyleBackColor = true;
             this.OriginalImage.Click += new System.EventHandler(this.OriginalImage_Click);
             // 
+            // Category
+            // 
+            this.Category.AutoSize = true;
+            this.Category.Font = new System.Drawing.Font("SimSun", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Category.Location = new System.Drawing.Point(451, 8);
+            this.Category.Name = "Category";
+            this.Category.Size = new System.Drawing.Size(120, 16);
+            this.Category.TabIndex = 4;
+            this.Category.Text = "CategoryNumber";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(577, 8);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 21);
+            this.textBox1.TabIndex = 5;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 511);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.Category);
             this.Controls.Add(this.OriginalImage);
             this.Controls.Add(this.GrayImage);
             this.Controls.Add(this.ImageArea);
@@ -89,6 +110,7 @@
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.ImageArea)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -98,6 +120,8 @@
         private System.Windows.Forms.PictureBox ImageArea;
         private System.Windows.Forms.Button GrayImage;
         private System.Windows.Forms.Button OriginalImage;
+        private System.Windows.Forms.Label Category;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

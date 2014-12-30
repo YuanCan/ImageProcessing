@@ -46,6 +46,11 @@ namespace ImageProcessing
 
             return instance;
         }
+        // private constructor for singleton instance
+        private ImageContainer()
+        {
+
+        }
 
         public GrayColorMix[] GetBitmapData(string path)
         {
@@ -113,8 +118,12 @@ namespace ImageProcessing
                             grayByteData[index + 1] = (byte)grayValue;
                             grayByteData[index + 2] = (byte)grayValue;
                         }
+
+                        grayData[grayDataIndex].x = x;
+                        grayData[grayDataIndex].y = y;
                     }
                 }
+                // copy data
                 Marshal.Copy(data, 0, originalDataPtr, length);
                 Marshal.Copy(grayByteData, 0, grayDataPtr, length);
                 bitmap.UnlockBits(bitmapData);
@@ -130,9 +139,10 @@ namespace ImageProcessing
         }
 
         public static UInt32 CalculateGray(UInt32 color,ref byte setAlpha)
-        {     
-        
-            UInt32 gray = (((color & 0x00ff0000) >> 16) * 299 + ((color & 0x0000ff00) >> 8) * 587 + (color & 0x000000ff) * 114 + 500) / 1000;
+        {          
+            UInt32 gray = (((color & 0x00ff0000) >> 16) * 299 + ((color & 0x0000ff00) >> 8) * 587 +
+                (color & 0x000000ff) * 114 + 500) / 1000;
+
             if (((color & 0xff000000) >> 24) == 0)
             {
                 setAlpha = 0;
@@ -150,5 +160,7 @@ namespace ImageProcessing
         public UInt32 color;
         public UInt32 gray;
         public UInt32 grayColor;
+        public int x;
+        public int y;
     }
 }

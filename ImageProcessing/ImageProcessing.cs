@@ -20,17 +20,21 @@ namespace ImageProcessing
     public class ClusterPoint
     {
         ///
+        /// gray value
+        ///
+        public double GrayValue { get; set; }
+        ///
         /// Gets or sets X-coord of the point
         ///
 
-        public double X { get; set; }
+        public int X { get; set; }
 
         ///
 
         /// Gets or sets Y-coord of the point
         ///
 
-        public double Y { get; set; }
+        public int Y { get; set; }
 
         ///
 
@@ -53,7 +57,7 @@ namespace ImageProcessing
 
         /// X-coord
         /// Y-coord
-        public ClusterPoint(double x, double y)
+        public ClusterPoint(int x, int y)
         {
             this.X = x;
             this.Y = y;
@@ -67,12 +71,18 @@ namespace ImageProcessing
 
         /// X-coord
         /// Y-coord
-        public ClusterPoint(double x, double y, object tag)
+        public ClusterPoint(int x, int y, object tag)
         {
             this.X = x;
             this.Y = y;
             this.Tag = tag;
             this.ClusterIndex = -1;
+        }
+
+        public ClusterPoint()
+        {
+            X = 0;
+            Y = 0;
         }
     }
 
@@ -86,9 +96,15 @@ namespace ImageProcessing
 
         /// Centroid x-coord
         /// Centroid y-coord
-        public ClusterCentroid(double x, double y)
+        public ClusterCentroid(int x, int y)
             : base(x, y)
         {
+        }
+
+        public ClusterCentroid()
+        {
+            X = 0;
+            Y = 0;
         }
     }
 
@@ -100,14 +116,14 @@ namespace ImageProcessing
         /// Array containing all points used by the algorithm
         ///
 
-        private List<ClusterPoint> Points;
+        private ClusterPoint[] Points;
 
         ///
 
         /// Array containing all clusters handled by the algorithm
         ///
 
-        private List<ClusterCentroid> Clusters;
+        private ClusterCentroid[] Clusters;
 
         ///
 
@@ -149,61 +165,6 @@ namespace ImageProcessing
         /// Initialize the algorithm with points and initial clusters
         ///
 
-        /// Points
-        /// Clusters
-        /// The fuzzyness factor to be used
-        public CMeansAlgorithm(List<ClusterPoint> points, List<ClusterCentroid> clusters, float fuzzy)
-        {
-            if (points == null)
-            {
-                throw new ArgumentNullException("points");
-            }
-
-            if (clusters == null)
-            {
-                throw new ArgumentNullException("clusters");
-            }
-
-            this.Points = points;
-            this.Clusters = clusters;
-
-            U = new double[this.Points.Count, this.Clusters.Count];
-            //Uk = new double[this.Points.Count, this.Clusters.Count];
-
-            this.Fuzzyness = fuzzy;
-
-            double diff;
-
-            // Iterate through all points to create initial U matrix
-            for (int i = 0; i < this.Points.Count; i++)
-            {
-                ClusterPoint p = this.Points[i];
-                double sum = 0.0;
-
-                for (int j = 0; j < this.Clusters.Count; j++)
-                {
-                    ClusterCentroid c = this.Clusters[j];
-                    diff = Math.Sqrt(Math.Pow(p.X - c.X, 2.0) + Math.Pow(p.Y - c.Y, 2.0));
-                    U[i, j] = (diff == 0) ? Eps : diff;
-                    sum += U[i, j];
-                }
-
-                double sum2 = 0.0;
-                for (int j = 0; j < this.Clusters.Count; j++)
-                {
-                    U[i, j] = 1.0 / Math.Pow(U[i, j] / sum, 2.0 / (Fuzzyness - 1.0));
-                    sum2 += U[i, j];
-                }
-
-                for (int j = 0; j < this.Clusters.Count; j++)
-                {
-                    U[i, j] = U[i, j] / sum2;
-                }
-            }
-
-            this.CalculateClusterCenters();
-        }
-
         ///
 
         /// Private constructor
@@ -220,12 +181,12 @@ namespace ImageProcessing
 
         private void RecalculateClusterIndexes()
         {
-            for (int i = 0; i < this.Points.Count; i++)
+            for (int i = 0; i < this.Points.Length; i++)
             {
                 double max = -1.0;
                 var p = this.Points[i];
 
-                for (int j = 0; j < this.Clusters.Count; j++)
+                for (int j = 0; j < this.Clusters.Length; j++)
                 {
                     if (max < U[i, j])
                     {
@@ -243,18 +204,18 @@ namespace ImageProcessing
 
         public void Step()
         {
-            for (int c = 0; c < Clusters.Count; c++)
+            for (int c = 0; c < Clusters.Length; c++)
             {
-                for (int h = 0; h < Points.Count; h++)
+                for (int h = 0; h < Points.Length; h++)
                 {
-                    double top = CalculateEulerDistance(Points[h], Clusters[c]);
+                    double top = CalculateGrayEulerDistance(Points[h], Clusters[c]);
                     if (top < 1.0) top = Eps;
 
                     // Bottom is the sum of distances from this data point to all clusters.
                     double sumTerms = 0.0;
-                    for (int ck = 0; ck < Clusters.Count; ck++)
+                    for (int ck = 0; ck < Clusters.Length; ck++)
                     {
-                        double thisDistance = CalculateEulerDistance(Points[h], Clusters[ck]);
+                        double thisDistance = CalculateGrayEulerDistance(Points[h], Clusters[ck]);
                         if (thisDistance < 1.0) thisDistance = Eps;
                         sumTerms += Math.Pow(top / thisDistance, 2.0 / (this.Fuzzyness - 1.0));
                     }
@@ -275,9 +236,11 @@ namespace ImageProcessing
         /// Point
         /// Centroid
         /// Calculated distance
-        private double CalculateEulerDistance(ClusterPoint p, ClusterCentroid c)
+        /// 
+
+        private double CalculateGrayEulerDistance(ClusterPoint p, ClusterCentroid c)
         {
-            return Math.Sqrt(Math.Pow(p.X - c.X, 2) + Math.Pow(p.Y - c.Y, 2));
+            return Math.Sqrt(Math.Pow(p.X - c.X, 2) + Math.Pow(p.Y - c.Y, 2) + Math.Pow(p.GrayValue-c.GrayValue,2));
         }
 
         ///
@@ -290,15 +253,14 @@ namespace ImageProcessing
         {
             double Jk = 0;
 
-            for (int i = 0; i < this.Points.Count; i++)
+            for (int i = 0; i < this.Points.Length; i++)
             {
-                for (int j = 0; j < this.Clusters.Count; j++)
+                for (int j = 0; j < this.Clusters.Length; j++)
                 {
-                    Jk += Math.Pow(U[i, j], this.Fuzzyness) * Math.Pow(this.CalculateEulerDistance(Points[i], Clusters[j]), 2);
+                    Jk += Math.Pow(U[i, j], this.Fuzzyness) * Math.Pow(this.CalculateGrayEulerDistance(Points[i], Clusters[j]), 2);
                 }
             }
             return Jk;
-            Console.WriteLine(Jk);
         }
 
         ///
@@ -308,14 +270,14 @@ namespace ImageProcessing
 
         private void CalculateClusterCenters()
         {
-            for (int j = 0; j < this.Clusters.Count; j++)
+            for (int j = 0; j < this.Clusters.Length; j++)
             {
                 ClusterCentroid c = this.Clusters[j];
                 double uX = 0.0;
                 double uY = 0.0;
                 double l = 0.0;
 
-                for (int i = 0; i < this.Points.Count; i++)
+                for (int i = 0; i < this.Points.Length; i++)
                 {
                     ClusterPoint p = this.Points[i];
 
@@ -330,6 +292,30 @@ namespace ImageProcessing
                 c.Y = ((int)(uY / l));
 
                 this.Log += string.Format("Cluster Centroid: ({0}; {1})" + System.Environment.NewLine, c.X, c.Y);
+            }
+        }
+
+        public void InitMembershipMatrix(double[,] matrix,int width,int height)
+        {
+            Random random = new Random((int)DateTime.UtcNow.Ticks);
+            int max = width * height;
+            long sum = 0;
+            for (int y = 0; y < width; y++)
+            {
+                for (int x = 0; x < height; x++)
+                {
+                    matrix[x, y] = random.Next(0,max);
+                    sum += (long)matrix[x, y];
+                }
+            }
+
+            // normalize
+            for (int y = 0; y < width; y++)
+            {
+                for (int x = 0; x < height; x++)
+                {
+                    matrix[x, y] /= sum;
+                }
             }
         }
 
@@ -358,6 +344,27 @@ namespace ImageProcessing
             }
             while (maxIterations > i);
             return i;
+        }
+
+        public void PrepareForRun(int categoryNumber)
+        {
+            // init membership matrix
+            ImageContainer container = ImageContainer.GetInstance();
+            int samplerNumber = container.imageData.Length;
+            U = new double[samplerNumber,categoryNumber];
+            this.Fuzzyness = 2;
+            Points = new ClusterPoint[samplerNumber];
+            Clusters = new ClusterCentroid[categoryNumber];
+
+            for (int index = 0; index < samplerNumber; index++)
+            {
+                GrayColorMix data = container.imageData[index];
+                Points[index] = new ClusterPoint(data.x,data.y);
+                Points[index].GrayValue = (double)data.gray;
+            }
+
+            InitMembershipMatrix(U, categoryNumber, samplerNumber);
+            CalculateClusterCenters();
         }
     }
 }

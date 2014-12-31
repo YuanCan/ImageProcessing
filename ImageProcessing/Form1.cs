@@ -24,7 +24,7 @@ namespace ImageProcessing
             // set the dialog filter type
             openFileDialog.Filter = "*.jpg,*.jpeg,*.bmp,*.jif,*.ico,*.png,*.tif,*.wmf|*.jpg;*.jpeg;*.bmp;*.gif;*.ico;*.png;*.tif;*.wmf";
             // display dialog
-            openFileDialog.ShowDialog();  
+            openFileDialog.ShowDialog();
             myname = openFileDialog.FileName;
             if (ViewController.GetInstance() == null)
             {
@@ -33,7 +33,8 @@ namespace ImageProcessing
 
             Image data = ViewController.GetInstance().OnClickOpenFile(myname);
             this.ImageArea.Image = data;
-            this.ClientSize = new System.Drawing.Size(data.Width + 20, data.Height + 50);
+
+            this.ClientSize = new System.Drawing.Size(Math.Max(ClientSize.Width, data.Width + 20), Math.Max(ClientSize.Height, data.Height + 50));
         }
 
         private void ImageArea_Click(object sender, EventArgs e)
@@ -57,7 +58,7 @@ namespace ImageProcessing
         {
             CMeansAlgorithm processing = new CMeansAlgorithm();
             processing.PrepareForRun(ViewController.GetInstance().categoryNumber);
-            processing.Run(Math.Pow(10, -5));
+            processing.Run(Math.Pow(10, -5),ViewController.GetInstance().iterateNumber);
             ImageContainer.GetInstance().CreateBitmap(processing.Points);
             this.ImageArea.Image = ImageContainer.GetInstance().processedBitmap;
         }
@@ -65,6 +66,11 @@ namespace ImageProcessing
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             int.TryParse(textBox1.Text, out ViewController.GetInstance().categoryNumber);
+        }
+
+        private void IterateValue_TextChanged(object sender, EventArgs e)
+        {
+            int.TryParse(IterateValue.Text, out ViewController.GetInstance().iterateNumber);
         }
     }
 }

@@ -61,7 +61,8 @@ namespace ImageProcessing
         {
             this.X = x;
             this.Y = y;
-            this.ClusterIndex = -1;
+            this.ClusterIndex = 0;
+            GrayValue = 1.0;
         }
 
         ///
@@ -76,13 +77,15 @@ namespace ImageProcessing
             this.X = x;
             this.Y = y;
             this.Tag = tag;
-            this.ClusterIndex = -1;
+            this.ClusterIndex = 0;
+            GrayValue = 1.0;
         }
 
         public ClusterPoint()
         {
             X = 0;
             Y = 0;
+            GrayValue = 1.0;
         }
     }
 
@@ -184,15 +187,15 @@ namespace ImageProcessing
         {
             for (int i = 0; i < this.Points.Length; i++)
             {
-                double max = -1.0;
+                double max = U[i, 0];
                 var p = this.Points[i];
-
-                for (int j = 0; j < this.Clusters.Length; j++)
+                p.ClusterIndex = 0;
+                for (int j = 1; j < this.Clusters.Length; j++)
                 {
-                    if (max < U[i, j])
+                    if (max > U[i, j])
                     {
                         max = U[i, j];
-                        p.ClusterIndex = (max == 0.5) ? 0.5 : j;
+                        p.ClusterIndex = j;
                     }
                 }
             }
@@ -222,7 +225,7 @@ namespace ImageProcessing
                     }
 
                     // Then the MF can be calculated as...
-                    U[h, c] = (double)(1.0 / sumTerms);
+                    U[h, c] = 1.0 / sumTerms;
                 }
             }
 
@@ -241,7 +244,7 @@ namespace ImageProcessing
 
         private double CalculateGrayEulerDistance(ClusterPoint p, ClusterCentroid c)
         {
-            return Math.Sqrt(Math.Pow(p.X - c.X, 2) + Math.Pow(p.Y - c.Y, 2) + Math.Pow(p.GrayValue-c.GrayValue,2));
+            return Math.Abs(p.GrayValue - c.GrayValue);
         }
 
         ///
@@ -275,7 +278,6 @@ namespace ImageProcessing
             {
                 ClusterCentroid c = this.Clusters[j];
                 double uX = 0.0;
-                double uY = 0.0;
                 double l = 0.0;
 
                 for (int i = 0; i < this.Points.Length; i++)
@@ -283,17 +285,16 @@ namespace ImageProcessing
                     ClusterPoint p = this.Points[i];
 
                     double uu = Math.Pow(U[i, j], this.Fuzzyness);
-                    uX += uu * c.X;
-                    uY += uu * c.Y;
+                    uX += uu * p.GrayValue;
                     l += uu;
                 }
 
+                c.GrayValue = (uX / l);
+               // c.Y = ((int)(uY / l));
 
-                c.X = ((int)(uX / l));
-                c.Y = ((int)(uY / l));
-
-                this.Log += string.Format("Cluster Centroid: ({0}; {1})" + System.Environment.NewLine, c.X, c.Y);
+                this.Log += string.Format("Cluster Centroid: ({0};)  ", c.GrayValue);
             }
+            this.Log += System.Environment.NewLine;
         }
 
         public void InitMembershipMatrix(double[,] matrix,int width,int height)
@@ -328,19 +329,19 @@ namespace ImageProcessing
 
         /// Algorithm accuracy
         /// The number of steps the algorithm needed to complete
-        public int Run(double accuracy)
+        public int Run(double accuracy, int maxIterations)
         {
             int i = 0;
-            int maxIterations = 20;
+            double Jnew = 0.0;
             do
             {
                 i++;
                 // get original objective value
                 this.J = this.CalculateObjectiveFunction();
+                this.Step();
                 // calculate cluster center
                 this.CalculateClusterCenters();
-                this.Step();
-                double Jnew = this.CalculateObjectiveFunction();
+                Jnew = this.CalculateObjectiveFunction();
                 if (Math.Abs(this.J - Jnew) < accuracy) break;
             }
             while (maxIterations > i);
@@ -361,11 +362,13 @@ namespace ImageProcessing
             {
                 GrayColorMix data = container.imageData[index];
                 Points[index] = new ClusterPoint(data.x,data.y);
+                // normalize gray value
                 Points[index].GrayValue = (double)data.gray;
             }
             for (int index = 0; index < categoryNumber;index++)
             {
                 Clusters[index] = new ClusterCentroid(0,0);
+                Clusters[index].GrayValue = 0;
             }
             InitMembershipMatrix(U, categoryNumber, samplerNumber);
             CalculateClusterCenters();

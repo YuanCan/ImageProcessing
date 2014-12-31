@@ -35,6 +35,8 @@
             this.Category = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.ImplementFCM = new System.Windows.Forms.Button();
+            this.IterateNumber = new System.Windows.Forms.Label();
+            this.IterateValue = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.ImageArea)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,7 +85,7 @@
             // 
             this.Category.AutoSize = true;
             this.Category.Font = new System.Drawing.Font("SimSun", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Category.Location = new System.Drawing.Point(451, 8);
+            this.Category.Location = new System.Drawing.Point(354, 7);
             this.Category.Name = "Category";
             this.Category.Size = new System.Drawing.Size(120, 16);
             this.Category.TabIndex = 4;
@@ -91,7 +93,7 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(577, 8);
+            this.textBox1.Location = new System.Drawing.Point(480, 3);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 21);
             this.textBox1.TabIndex = 5;
@@ -107,11 +109,31 @@
             this.ImplementFCM.UseVisualStyleBackColor = true;
             this.ImplementFCM.Click += new System.EventHandler(this.ImplementFCM_Click);
             // 
+            // IterateNumber
+            // 
+            this.IterateNumber.AutoSize = true;
+            this.IterateNumber.Font = new System.Drawing.Font("SimSun", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.IterateNumber.Location = new System.Drawing.Point(586, 3);
+            this.IterateNumber.Name = "IterateNumber";
+            this.IterateNumber.Size = new System.Drawing.Size(112, 16);
+            this.IterateNumber.TabIndex = 7;
+            this.IterateNumber.Text = "IterateNumber";
+            // 
+            // IterateValue
+            // 
+            this.IterateValue.Location = new System.Drawing.Point(695, 2);
+            this.IterateValue.Name = "IterateValue";
+            this.IterateValue.Size = new System.Drawing.Size(100, 21);
+            this.IterateValue.TabIndex = 8;
+            this.IterateValue.TextChanged += new System.EventHandler(this.IterateValue_TextChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 511);
+            this.Controls.Add(this.IterateValue);
+            this.Controls.Add(this.IterateNumber);
             this.Controls.Add(this.ImplementFCM);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.Category);
@@ -136,6 +158,8 @@
         private System.Windows.Forms.Label Category;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button ImplementFCM;
+        private System.Windows.Forms.Label IterateNumber;
+        private System.Windows.Forms.TextBox IterateValue;
     }
 }
 

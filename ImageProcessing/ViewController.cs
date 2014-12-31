@@ -9,6 +9,7 @@ namespace ImageProcessing
     public class ViewController
     {
         public int categoryNumber;
+        public int iterateNumber;
 
         private static ViewController instance;
 

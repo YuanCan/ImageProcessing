@@ -11,10 +11,11 @@ namespace ImageProcessing
     {
         public GrayColorMix[] imageData;
         public Bitmap processedBitmap;
+        public bool grayBitmapInit = false;
 
         private Bitmap grayBitmap;
         private Bitmap originalBitmap;
-       
+
 
         private int width;
         private int height;
@@ -56,13 +57,16 @@ namespace ImageProcessing
 
         public GrayColorMix[] GetBitmapData(string path)
         {
+            int testIndex = 0;
             try
             {
                 Bitmap bitmap = new Bitmap(path);
                 // save the original bitmap
                 originalBitmap = bitmap;
                 // create the gray bitmap
-                grayBitmap = new Bitmap(bitmap.Width, bitmap.Height);
+                grayBitmap = new Bitmap(bitmap.Width, bitmap.Height, originalBitmap.PixelFormat);
+                // create process bitmap
+                processedBitmap = new Bitmap(bitmap.Width, bitmap.Height, originalBitmap.PixelFormat);
                 GrayColorMix[] grayData = new GrayColorMix[bitmap.Width * bitmap.Height];
 
                 width = bitmap.Width;
@@ -90,18 +94,18 @@ namespace ImageProcessing
                 int offset = bitmap.PixelFormat == PixelFormat.Format32bppArgb ? 4 : 3;
                 // copy the bitmap data
                 Marshal.Copy(originalDataPtr, data, 0, length);
+                int grayDataIndex = 0;
                 for (int y = 0; y < height; y++)
                 {
                     for (int x = 0, xMax = bitmapData.Width * offset; x < xMax; x += offset)
                     {
                         int index = (y * stride) + x;
-                        int grayDataIndex = index / offset;
                         grayData[grayDataIndex] = new GrayColorMix();
                         if (bitmap.PixelFormat == PixelFormat.Format32bppArgb)
                         {
                             grayData[grayDataIndex].color = ((UInt32)data[index + 3] << 24) + ((UInt32)data[index + 2] << 16) +
                                 ((UInt32)data[index + 1] << 8) + (UInt32)data[index];
-                            grayData[grayDataIndex].gray = CalculateGray(grayData[grayDataIndex].color,ref grayByteData[index + 3]);
+                            grayData[grayDataIndex].gray = CalculateGray(grayData[grayDataIndex].color, ref grayByteData[index + 3]);
                             UInt32 grayValue = grayData[grayDataIndex].gray;
 
                             grayByteData[index] = (byte)grayValue;
@@ -114,7 +118,7 @@ namespace ImageProcessing
                             grayData[grayDataIndex].color = ((UInt32)data[index + 2] << 16) + ((UInt32)data[index + 1] << 8) +
                                 ((UInt32)data[index]);
                             byte dataTemp = new byte();
-                            grayData[grayDataIndex].gray = CalculateGray(grayData[grayDataIndex].color,ref dataTemp);
+                            grayData[grayDataIndex].gray = CalculateGray(grayData[grayDataIndex].color, ref dataTemp);
                             UInt32 grayValue = grayData[grayDataIndex].gray;
                             grayByteData[index] = (byte)grayValue;
                             grayByteData[index + 1] = (byte)grayValue;
@@ -123,6 +127,8 @@ namespace ImageProcessing
 
                         grayData[grayDataIndex].x = x;
                         grayData[grayDataIndex].y = y;
+
+                        grayDataIndex++;
                     }
                 }
                 // copy data
@@ -140,8 +146,8 @@ namespace ImageProcessing
             }
         }
 
-        public static UInt32 CalculateGray(UInt32 color,ref byte setAlpha)
-        {          
+        public static UInt32 CalculateGray(UInt32 color, ref byte setAlpha)
+        {
             UInt32 gray = (((color & 0x00ff0000) >> 16) * 299 + ((color & 0x0000ff00) >> 8) * 587 +
                 (color & 0x000000ff) * 114 + 500) / 1000;
 
@@ -166,7 +172,7 @@ namespace ImageProcessing
 
             if (processedBitmap == null)
             {
-                processedBitmap = new Bitmap(width, height);
+                processedBitmap = new Bitmap(width, height, originalBitmap.PixelFormat);
             }
             Rectangle rect = new Rectangle(0, 0, width, height);
             BitmapData data = processedBitmap.LockBits(rect, ImageLockMode.ReadWrite, originalBitmap.PixelFormat);
@@ -176,21 +182,26 @@ namespace ImageProcessing
             int offset = originalBitmap.PixelFormat == PixelFormat.Format32bppArgb ? 4 : 3;
             // copy the bitmap data
             Marshal.Copy(data.Scan0, bytesData, 0, length);
-            for (int index = 0; index < length; index += offset)
+            int dataIndex = 0;
+            for (int y = 0; y < height; y++)
             {
-                int dataIndex = index / offset;
-                if (originalBitmap.PixelFormat == PixelFormat.Format32bppArgb)
+                for (int x = 0, xMax = originalBitmap.Width * offset; x < xMax; x += offset)
                 {
-                    bytesData[index] = (byte)(points[dataIndex].ClusterIndex * 100);
-                    bytesData[index + 1] = (byte)(points[dataIndex].ClusterIndex * 100);
-                    bytesData[index + 2] = (byte)(points[dataIndex].ClusterIndex * 100);
-                    bytesData[index + 3] =0xff;
-                }
-                else
-                {
-                    bytesData[index] = (byte)(points[dataIndex].ClusterIndex * 100);
-                    bytesData[index + 1] = (byte)(points[dataIndex].ClusterIndex * 100);
-                    bytesData[index + 2] = (byte)(points[dataIndex].ClusterIndex * 100);
+                    int index = (y * data.Stride) + x;
+                    if (originalBitmap.PixelFormat == PixelFormat.Format32bppArgb)
+                    {
+                        bytesData[index] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
+                        bytesData[index + 1] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
+                        bytesData[index + 2] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
+                        bytesData[index + 3] = 0xff;
+                    }
+                    else
+                    {
+                        bytesData[index] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
+                        bytesData[index + 1] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
+                        bytesData[index + 2] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
+                    }
+                    dataIndex++;
                 }
             }
             Marshal.Copy(bytesData, 0, data.Scan0, length);

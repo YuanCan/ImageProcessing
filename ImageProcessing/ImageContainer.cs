@@ -83,15 +83,21 @@ namespace ImageProcessing
                 // get the bitmap data pointer
                 IntPtr originalDataPtr = bitmapData.Scan0;
                 IntPtr grayDataPtr = grayBitmapData.Scan0;
-                if (bitmap.PixelFormat != PixelFormat.Format32bppArgb && bitmap.PixelFormat != PixelFormat.Format24bppRgb)
+                if (bitmap.PixelFormat != PixelFormat.Format32bppArgb && bitmap.PixelFormat != PixelFormat.Format24bppRgb
+                    && bitmap.PixelFormat != PixelFormat.Format8bppIndexed)
                 {
-                    Console.WriteLine("Invalid Pixel format " + bitmap.PixelFormat);
+                    Console.WriteLine("Invalid Pixel format " + bitmap.PixelFormat);                   
                     imageData = null;
                     grayBitmap = null;
                     originalBitmap = null;
                     return null;
                 }
                 int offset = bitmap.PixelFormat == PixelFormat.Format32bppArgb ? 4 : 3;
+                if (bitmap.PixelFormat == PixelFormat.Format8bppIndexed)
+                {
+                    offset = 1;
+                    grayBitmap.Palette = bitmap.Palette;
+                }
                 // copy the bitmap data
                 Marshal.Copy(originalDataPtr, data, 0, length);
                 int grayDataIndex = 0;
@@ -123,6 +129,14 @@ namespace ImageProcessing
                             grayByteData[index] = (byte)grayValue;
                             grayByteData[index + 1] = (byte)grayValue;
                             grayByteData[index + 2] = (byte)grayValue;
+                        }
+                        else
+                        {
+                            int paletteIndex = (int)data[index];
+                            grayData[grayDataIndex].color = (UInt32)bitmap.Palette.Entries[paletteIndex].ToArgb();
+                            byte dataTemp = new byte();
+                            grayData[grayDataIndex].gray = CalculateGray(grayData[grayDataIndex].color, ref dataTemp);
+                            grayByteData[index] = (byte)data[index];
                         }
 
                         grayData[grayDataIndex].x = x;
@@ -180,6 +194,11 @@ namespace ImageProcessing
             byte[] bytesData = new byte[length];
             // get the byte offset
             int offset = originalBitmap.PixelFormat == PixelFormat.Format32bppArgb ? 4 : 3;
+            if (originalBitmap.PixelFormat == PixelFormat.Format8bppIndexed)
+            {
+                offset = 1;
+                processedBitmap.Palette = originalBitmap.Palette;
+            }
             // copy the bitmap data
             Marshal.Copy(data.Scan0, bytesData, 0, length);
             int dataIndex = 0;
@@ -188,18 +207,23 @@ namespace ImageProcessing
                 for (int x = 0, xMax = originalBitmap.Width * offset; x < xMax; x += offset)
                 {
                     int index = (y * data.Stride) + x;
+                    byte calculateValue = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
                     if (originalBitmap.PixelFormat == PixelFormat.Format32bppArgb)
                     {
-                        bytesData[index] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
-                        bytesData[index + 1] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
-                        bytesData[index + 2] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
+                        bytesData[index] = calculateValue;
+                        bytesData[index + 1] = calculateValue;
+                        bytesData[index + 2] = calculateValue;
                         bytesData[index + 3] = 0xff;
+                    }
+                    else if(originalBitmap.PixelFormat == PixelFormat.Format24bppRgb)
+                    {
+                        bytesData[index] = calculateValue;
+                        bytesData[index + 1] = calculateValue;
+                        bytesData[index + 2] = calculateValue;
                     }
                     else
                     {
-                        bytesData[index] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
-                        bytesData[index + 1] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
-                        bytesData[index + 2] = (byte)(points[dataIndex].ClusterIndex * 255.0 / (ViewController.GetInstance().categoryNumber - 1));
+                        bytesData[index] = calculateValue;
                     }
                     dataIndex++;
                 }

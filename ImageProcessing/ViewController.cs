@@ -11,6 +11,8 @@ namespace ImageProcessing
         public int categoryNumber;
         public int iterateNumber;
 
+        public Action<long> timeUpdate;
+
         private static ViewController instance;
 
         static public ViewController GetInstance()

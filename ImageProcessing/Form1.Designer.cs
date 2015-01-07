@@ -37,6 +37,7 @@
             this.ImplementFCM = new System.Windows.Forms.Button();
             this.IterateNumber = new System.Windows.Forms.Label();
             this.IterateValue = new System.Windows.Forms.TextBox();
+            this.TimeCost = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.ImageArea)).BeginInit();
             this.SuspendLayout();
             // 
@@ -127,11 +128,21 @@
             this.IterateValue.TabIndex = 8;
             this.IterateValue.TextChanged += new System.EventHandler(this.IterateValue_TextChanged);
             // 
+            // TimeCost
+            // 
+            this.TimeCost.AutoSize = true;
+            this.TimeCost.Font = new System.Drawing.Font("SimSun", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TimeCost.Location = new System.Drawing.Point(800, 2);
+            this.TimeCost.Name = "TimeCost";
+            this.TimeCost.Size = new System.Drawing.Size(0, 16);
+            this.TimeCost.TabIndex = 10;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(884, 511);
+            this.ClientSize = new System.Drawing.Size(945, 545);
+            this.Controls.Add(this.TimeCost);
             this.Controls.Add(this.IterateValue);
             this.Controls.Add(this.IterateNumber);
             this.Controls.Add(this.ImplementFCM);
@@ -160,6 +171,7 @@
         private System.Windows.Forms.Button ImplementFCM;
         private System.Windows.Forms.Label IterateNumber;
         private System.Windows.Forms.TextBox IterateValue;
+        private System.Windows.Forms.Label TimeCost;
     }
 }
 

@@ -19,6 +19,7 @@ namespace ImageProcessing
 
     public class ClusterPoint
     {
+        public UInt32 color;
         ///
         /// gray value
         ///
@@ -333,6 +334,8 @@ namespace ImageProcessing
         {
             int i = 0;
             double Jnew = 0.0;
+            // record the time
+            long beginTime = DateTime.UtcNow.Ticks;
             do
             {
                 i++;
@@ -345,6 +348,10 @@ namespace ImageProcessing
                 if (Math.Abs(this.J - Jnew) < accuracy) break;
             }
             while (maxIterations > i);
+            if (ViewController.GetInstance().timeUpdate != null)
+            {
+                ViewController.GetInstance().timeUpdate(DateTime.UtcNow.Ticks - beginTime);
+            }
             return i;
         }
 

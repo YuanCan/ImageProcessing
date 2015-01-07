@@ -13,6 +13,22 @@ namespace ImageProcessing
         public Form1()
         {
             InitializeComponent();
+            InitAction();
+        }
+
+        public void InitAction()
+        {
+            ViewController.GetInstance().timeUpdate += UpdateTimeCost;
+        }
+
+        public void ReleaseAction()
+        {
+            ViewController.GetInstance().timeUpdate -= UpdateTimeCost;
+        }
+
+        public void UpdateTimeCost(long time)
+        {
+            TimeCost.Text = "TimeCost: " + (time / (long)10000).ToString() + "ms";
         }
 
         private void OpenImage_Click(object sender, EventArgs e)
@@ -33,13 +49,16 @@ namespace ImageProcessing
 
             Image data = ViewController.GetInstance().OnClickOpenFile(myname);
             this.ImageArea.Image = data;
-
+            if (data == null)
+            {
+                return;
+            }
             this.ClientSize = new System.Drawing.Size(Math.Max(ClientSize.Width, data.Width + 20), Math.Max(ClientSize.Height, data.Height + 50));
         }
 
         private void ImageArea_Click(object sender, EventArgs e)
         {
-
+            OpenImage_Click(sender, e);
         }
 
         private void GrayImage_Click(object sender, EventArgs e)

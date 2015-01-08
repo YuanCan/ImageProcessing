@@ -10,6 +10,7 @@ namespace ImageProcessing
     {
         public int categoryNumber;
         public int iterateNumber;
+        public int testCode;
 
         public Action<long> timeUpdate;
 
